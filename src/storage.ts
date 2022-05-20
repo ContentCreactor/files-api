@@ -31,9 +31,6 @@ export const Login = async (request: any, response: any) => {
         });
 
 
-        console.log('found user', user.salt)
-
-
         const hashedUserPass = calculateHash({ plaintextPassword: password, salt: user.salt })
 
         if (hashedUserPass !== user.password) {
@@ -78,9 +75,6 @@ export const Register = async (request: any, response: any) => {
                 message: 'username is already registered'
             });
         }
-
-        console.log('users', password,
-            username)
 
         const { hashedPassword, salt } = hashNewPassword({ plaintextPassword: password })
 
