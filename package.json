@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start:production": "yarn build && node ./dist",
     "start": "nodemon --watch 'src/**' --ext 'ts,json' --exec 'ts-node src/index.ts'",
     "build": "yarn clean && tsc -p tsconfig-build.json",
     "prestart": "yarn build",
