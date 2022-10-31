@@ -1,5 +1,8 @@
 import Users from "./models/users";
 import { calculateHash, hashNewPassword } from "./services/users";
+import { uuid } from 'uuidv4';
+import Session from "./models/session";
+import dayjs from "dayjs";
 
 export const GetFiles = (request: any, response: any) => {
     const data = [
@@ -39,13 +42,45 @@ export const Login = async (request: any, response: any) => {
             });
         }
 
+        console.log('user was good')
 
         // !!!!!!!!!!TODO: create session and set cookie later
 
+        // generate a random UUID as the session token
+        const sessionToken = uuid()
+
+        // set the expiry time as 120s after the current time
+        const now = new Date()
+        const expiresAt = new Date(+now + 120 * 1000)
+
+        // create a session containing information about the user and expiry time
+
+        const userSession = await Session.create({
+            userId: user.id,
+            username,
+            expiresAt,
+            token: sessionToken,
+        });
+
+        // In the response, set a cookie on the client with the name "session_cookie"
+        // and the value as the UUID we generated. We also set the expiry time
+        console.log('asd,', process.env.NODE_ENV !== "development")
+
+        response.setHeader('Set-Cookie', 'foo=bar; HttpOnly');
+        response.cookie("session", sessionToken, {
+            secure: false,//process.env.NODE_ENV !== "development",
+            httpOnly: true,
+            sameSite: 'strict',
+            expires: dayjs().add(30, "days").toDate(),
+        });
+
+
         response.status(200).json({
             message: 'login success',
+            username,
         });
     } catch (err) {
+        console.log('err', err)
         response.status(404).json({
             status: 'fail',
         });
@@ -61,16 +96,19 @@ export const Register = async (request: any, response: any) => {
         } = request.body
 
         if (!password || !username) {
-            response.status(400).json({
+           return  response.status(400).json({
                 status: 'fail',
                 message: 'username and password is required'
             });
         }
 
+        console.log('finding existing users')
+
         const existingUser = await Users.find({ username });
+        console.log('foud existing users', existingUser)
 
         if (existingUser.length > 0) {
-            response.status(400).json({
+            return response.status(400).json({
                 status: 'fail',
                 message: 'username is already registered'
             });
@@ -85,8 +123,23 @@ export const Register = async (request: any, response: any) => {
             username: username.toLowerCase(),
         });
 
-        response.status(200).json({
+        return  response.status(200).json({
             status: 'account created success',
+        });
+    } catch (err) {
+        console.error('error creating user', err)
+
+        return response.status(404).json({
+            status: 'fail',
+        });
+    }
+};
+
+export const Auth = async (request: any, response: any) => {
+    try {
+        console.log('returning userd', request.context.user)
+        response.status(200).json({
+            username: request.context.user,
         });
     } catch (err) {
         console.error('error creating user', err)
