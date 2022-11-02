@@ -13,6 +13,9 @@ export const GetFiles = (request: any, response: any) => {
         { Key: 'foo2/bar3/baz3.file', Size: 5, LastModified: new Date('2000-01-01 00:00:01 +0000') },
     ];
 
+    console.log('asd,', process.env.NODE_ENV)
+
+
     response.send(data);
 };
 
@@ -64,11 +67,9 @@ export const Login = async (request: any, response: any) => {
 
         // In the response, set a cookie on the client with the name "session_cookie"
         // and the value as the UUID we generated. We also set the expiry time
-        console.log('asd,', process.env.NODE_ENV !== "development")
 
-        response.setHeader('Set-Cookie', 'foo=bar; HttpOnly');
         response.cookie("session", sessionToken, {
-            secure: false,//process.env.NODE_ENV !== "development",
+            secure: process.env.NODE_ENV !== "development",
             httpOnly: true,
             sameSite: 'strict',
             expires: dayjs().add(30, "days").toDate(),

@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import { Auth, GetFiles, Login, Register } from './storage';
-import { DATABASE_URI, MONGODB_DATABASE, MONGODB_PASSWORD } from './constants';
+import { DATABASE_URI, MONGODB_DATABASE, MONGODB_PASSWORD, MONGODB_USER } from './constants';
 import mongoose from 'mongoose';
 import expressContext from "express-request-context";
 import { authenticator } from './middleware/authentication';
@@ -14,15 +14,8 @@ app.use(cors({
     origin: 'http://example.com',
     credentials: true,
     methods: ['GET', 'POST'],
-    allowedHeaders: ['Origin','Content-Type', 'Authorization']
+    allowedHeaders: ['Origin', 'Content-Type', 'Authorization']
 }));
-
-// app.use((req, res, next) => {
-//     //res.set("Access-Control-Allow-Origin", "");
-//     res.set("Access-Control-Allow-Methods", "");
-//     res.set("Access-Control-Allow-Headers", "Content-Type, *");
-//     return next();
-//   });
 
 app.use(cookieParser());
 app.use(expressContext()); // This will enable the 'context' object for you.
@@ -32,14 +25,17 @@ app.use(express.urlencoded({ extended: true }));
 
 
 const DB = DATABASE_URI
-//.replace(
-//     '<password>',
-//     'supersecurepass'//MONGODB_PASSWORD ||
-// )
-// ).replace(
-//     '<database>',
-//     'supersecurepass'//MONGODB_DATABASE || 
-// );
+    .replace(
+        '<user>',
+        MONGODB_USER
+    )
+    .replace(
+        '<password>',
+        MONGODB_PASSWORD
+    ).replace(
+        '<database>',
+        MONGODB_DATABASE
+    );
 
 mongoose.connect(DB)
 

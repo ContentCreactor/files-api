@@ -11,7 +11,7 @@ export const authenticator = async (req: any, res: any, next: any) => {
     }
 
     // We can obtain the session token from the requests cookies, which come with every request
-    const sessionToken = req.cookies['session']
+    const sessionToken = req.cookies.session
     if (!sessionToken) {
         // If the cookie is not set, return an unauthorized status
         res.status(401).end()
@@ -20,7 +20,6 @@ export const authenticator = async (req: any, res: any, next: any) => {
 
     // We then get the session of the user from our session map
     // that we set in the signinHandler
-
     const userSession: any = await Session.findOne({token: sessionToken})
 
     if (!userSession) {
