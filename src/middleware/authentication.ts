@@ -1,12 +1,11 @@
+import dayjs from "dayjs"
 import Session from "../models/session"
 
 export const authenticator = async (req: any, res: any, next: any) => {
     // if this request doesn't have any cookies, that means it isn't
     // authenticated. Return an error code.
-    console.log('cookie is', req.cookies)
-
     if (!req.cookies) {
-        res.status(401).end()
+        res.status(401).json().end()
         return
     }
 
@@ -14,7 +13,7 @@ export const authenticator = async (req: any, res: any, next: any) => {
     const sessionToken = req.cookies.session
     if (!sessionToken) {
         // If the cookie is not set, return an unauthorized status
-        res.status(401).end()
+        res.status(401).json().end()
         return
     }
 
@@ -24,7 +23,7 @@ export const authenticator = async (req: any, res: any, next: any) => {
 
     if (!userSession) {
         // If the session token is not present in session map, return an unauthorized error
-        res.status(401).end()
+        res.status(401).json().end()
         return
     }
     // if the session has expired, return an unauthorized error, and delete the 
@@ -33,12 +32,12 @@ export const authenticator = async (req: any, res: any, next: any) => {
 
     if (isExpired) {
         //delete sessions[sessionToken]
-        res.status(401).end()
+        res.status(401).json().end()
         return
     }
 
     // If all checks have passed, we can consider the user authenticated and
     // send a welcome message
-    req.context.user = userSession.username
+    req.context.user = { id: userSession.userId ,username: userSession.username }
     next()
 }

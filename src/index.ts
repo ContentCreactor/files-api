@@ -6,16 +6,19 @@ import mongoose from 'mongoose';
 import expressContext from "express-request-context";
 import { authenticator } from './middleware/authentication';
 import cookieParser from 'cookie-parser';
+import { Me } from './controllers/users';
 
 const app = express();
 const port = 8080; // default port to listen
 
 app.use(cors({
-    origin: 'http://example.com',
+    origin: 'https://example.com',
     credentials: true,
     methods: ['GET', 'POST'],
     allowedHeaders: ['Origin', 'Content-Type', 'Authorization']
 }));
+
+//app.use(express.json())
 
 app.use(cookieParser());
 app.use(expressContext()); // This will enable the 'context' object for you.
@@ -41,6 +44,7 @@ mongoose.connect(DB)
 
 app.get('/', GetFiles);
 app.get('/auth', authenticator, Auth);
+app.get('/me', authenticator, Me);
 
 //app.get('/', GetFiles);
 app.post('/login', Login);

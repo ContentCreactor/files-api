@@ -53,8 +53,10 @@ export const Login = async (request: any, response: any) => {
         const sessionToken = uuid()
 
         // set the expiry time as 120s after the current time
-        const now = new Date()
-        const expiresAt = new Date(+now + 120 * 1000)
+  //      const now = new Date()
+//        new Date(+now + 120 * 1000)
+
+        const expiresAt = dayjs().add(30, "days").toDate()
 
         // create a session containing information about the user and expiry time
 
@@ -68,8 +70,10 @@ export const Login = async (request: any, response: any) => {
         // In the response, set a cookie on the client with the name "session_cookie"
         // and the value as the UUID we generated. We also set the expiry time
 
+        console.log('settig cookie to expier at', dayjs().add(30, "days").toDate())
         response.cookie("session", sessionToken, {
-            secure: process.env.NODE_ENV !== "development",
+            domain: 'example.com',
+            secure: true, //process.env.NODE_ENV !== "development",
             httpOnly: true,
             sameSite: 'strict',
             expires: dayjs().add(30, "days").toDate(),
